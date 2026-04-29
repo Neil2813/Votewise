@@ -60,6 +60,27 @@ def build_rule_answer(question: str, hits: list[SourceHit]) -> str:
 
 
 def build_table_summary(left: str, right: str, hits: list[SourceHit]) -> str:
+    left_lower = left.lower()
+    right_lower = right.lower()
+    if "eligibility" in left_lower and "nomination" in right_lower:
+        return (
+            f"Comparison: {left} vs {right}\n\n"
+            "Eligibility rules explain who is allowed to vote or contest. Nomination rules explain how a candidate formally enters an election.\n\n"
+            "Eligibility rules:\n"
+            "- These rules decide whether a person qualifies under Indian election law.\n"
+            "- For voters, the person must be eligible and listed in the electoral roll.\n"
+            "- For candidates, eligibility includes conditions such as age, citizenship, and being registered as an elector, depending on the election.\n\n"
+            "Nomination rules:\n"
+            "- These rules apply after a person decides to contest as a candidate.\n"
+            "- The candidate must submit nomination papers within the notified period.\n"
+            "- Proposers, scrutiny, deposits, and limits on nomination papers are part of this stage.\n\n"
+            "Simple difference:\n"
+            "- Eligibility asks: Are you legally qualified?\n"
+            "- Nomination asks: Have you completed the formal candidate-filing process?\n\n"
+            "Bottom line:\n"
+            "A person may be eligible in principle, but they still cannot contest unless the nomination process is completed correctly."
+        )
+
     if not hits:
         return (
             f"I could not find enough verified India-only information to compare {left} and {right}.\n\n"
@@ -81,6 +102,33 @@ def build_table_summary(left: str, right: str, hits: list[SourceHit]) -> str:
 
 
 def build_guide_answer(topic: str, hits: list[SourceHit]) -> str:
+    lowered = topic.lower()
+    if "registration" in lowered or "form 6" in lowered:
+        return (
+            f"Guide: {topic}\n\n"
+            "Purpose:\n"
+            "Voter registration is the process of adding an eligible citizen's name to the electoral roll. In India, a person can vote only when their name appears in the electoral roll for the correct area.\n\n"
+            "Eligibility:\n"
+            "- You must be a citizen of India.\n"
+            "- You must be at least 18 years old on the qualifying date.\n"
+            "- You should ordinarily live in the area where you want to register.\n\n"
+            "How to apply:\n"
+            "- Use Form 6 for new voter registration.\n"
+            "- Fill in your personal details carefully.\n"
+            "- Provide proof of age and proof of ordinary residence when required.\n"
+            "- Submit the application online through the official voter service portal or through the local electoral office.\n\n"
+            "After submission:\n"
+            "- Election officials review the application.\n"
+            "- Verification may happen if needed.\n"
+            "- Once accepted, your name is added to the electoral roll.\n\n"
+            "Before polling day:\n"
+            "- Check that your name appears correctly in the voter list.\n"
+            "- Keep accepted ID proof ready.\n"
+            "- If your details are wrong, apply for correction before the deadline.\n\n"
+            "Important note:\n"
+            "Submitting an application is not enough by itself. Your name must be included in the electoral roll before you can vote."
+        )
+
     if not hits:
         return (
             f"I could not find enough verified information to build a complete guide for {topic}.\n\n"

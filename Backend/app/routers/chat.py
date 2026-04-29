@@ -20,6 +20,7 @@ Rules:
 - If retrieved knowledge is weak, incomplete, or placeholder-like, still answer using general India election knowledge.
 - Never expose raw retrieval labels, source names, placeholders, indexes, or database wording.
 - Give a polished chatbot answer with a short direct answer, explanation, and practical next steps.
+- Plain text only. Do not use Markdown syntax like **bold**, # headings, tables, or citation markers.
 """
 
 
@@ -50,6 +51,7 @@ Retrieved knowledge, only if useful:
 Answer as a helpful chatbot for Indian election education.
 Do not simply summarize retrieval.
 If the retrieved text is thin or awkward, write a better explanation from your India election knowledge.
+Use plain text only.
 """
 
     result = await process_response(
