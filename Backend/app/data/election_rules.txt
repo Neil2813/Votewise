@@ -1,0 +1,158 @@
+TITLE: Election Rules and Candidate Guidelines (India)
+
+SOURCE: Election Commission of India (ECI)
+
+---
+
+SECTION: Eligibility to Contest Elections
+
+RULE:
+Minimum age to contest Lok Sabha or Vidhan Sabha elections is 25 years. :contentReference[oaicite:0]{index=0}
+
+RULE:
+A person must be registered as a voter in an electoral roll to contest elections. :contentReference[oaicite:1]{index=1}
+
+RULE:
+A person registered as a voter in one state can contest Lok Sabha elections from another state (with exceptions like certain regions). :contentReference[oaicite:2]{index=2}
+
+RULE:
+A Scheduled Caste or Scheduled Tribe candidate can contest from reserved or general constituencies. :contentReference[oaicite:3]{index=3}
+
+RULE:
+A person convicted and sentenced to imprisonment (2 years or more) is disqualified from contesting elections. :contentReference[oaicite:4]{index=4}
+
+---
+
+SECTION: Voting Eligibility
+
+RULE:
+A person in prison cannot vote in elections. :contentReference[oaicite:5]{index=5}
+
+RULE:
+A person under preventive detention is allowed to vote via postal ballot. :contentReference[oaicite:6]{index=6}
+
+---
+
+SECTION: Security Deposit
+
+RULE:
+Security deposit for Lok Sabha election:
+- General: ₹10,000  
+- SC/ST: ₹5,000 :contentReference[oaicite:7]{index=7}
+
+RULE:
+Security deposit for Vidhan Sabha election:
+- General: ₹5,000  
+- SC/ST: ₹2,500 :contentReference[oaicite:8]{index=8}
+
+RULE:
+Deposit is forfeited if candidate fails to secure at least one-sixth of valid votes. :contentReference[oaicite:9]{index=9}
+
+---
+
+SECTION: Nomination Rules
+
+RULE:
+Recognized party candidate requires only 1 proposer. :contentReference[oaicite:10]{index=10}
+
+RULE:
+Independent or unrecognized party candidate requires 10 proposers. :contentReference[oaicite:11]{index=11}
+
+RULE:
+A candidate can contest from a maximum of 2 constituencies. :contentReference[oaicite:12]{index=12}
+
+RULE:
+Maximum 4 nomination papers can be filed in one constituency. :contentReference[oaicite:13]{index=13}
+
+RULE:
+Only limited number of people are allowed during nomination filing and scrutiny. :contentReference[oaicite:14]{index=14}
+
+---
+
+SECTION: Oath Requirement
+
+RULE:
+Candidate must take oath or affirmation before an authorized officer. :contentReference[oaicite:15]{index=15}
+
+RULE:
+Oath must be completed before scrutiny of nominations. :contentReference[oaicite:16]{index=16}
+
+---
+
+SECTION: Election Symbols
+
+RULE:
+Symbols are allotted by the Returning Officer. :contentReference[oaicite:17]{index=17}
+
+RULE:
+Recognized party candidates must submit Form A and Form B for symbol allocation. :contentReference[oaicite:18]{index=18}
+
+RULE:
+Independent candidates can choose from available free symbols. :contentReference[oaicite:19]{index=19}
+
+---
+
+SECTION: Campaign Rules
+
+RULE:
+Vehicles used for campaigning require prior approval from Returning Officer. :contentReference[oaicite:20]{index=20}
+
+RULE:
+Campaign meetings and processions are prohibited 48 hours before polling ends. :contentReference[oaicite:21]{index=21}
+
+RULE:
+Campaign offices cannot be set up near polling stations or in restricted areas (schools, hospitals, religious places). :contentReference[oaicite:22]{index=22}
+
+RULE:
+Distribution of items like clothes to voters is considered bribery and is not allowed. :contentReference[oaicite:23]{index=23}
+
+---
+
+SECTION: Poll Day Rules
+
+RULE:
+Voter assistance booths are provided to help locate names in electoral roll. :contentReference[oaicite:24]{index=24}
+
+RULE:
+Election booths must be set up at least 200 meters away from polling stations. :contentReference[oaicite:25]{index=25}
+
+RULE:
+Canvassing is prohibited within 100 meters of polling station. :contentReference[oaicite:26]{index=26}
+
+RULE:
+Carrying weapons near polling station is prohibited. :contentReference[oaicite:27]{index=27}
+
+---
+
+SECTION: Voting Methods
+
+RULE:
+Postal ballot is available for:
+- Service voters
+- Election duty staff
+- Preventive detention voters :contentReference[oaicite:28]{index=28}
+
+RULE:
+Proxy voting is allowed only for certain service voters. :contentReference[oaicite:29]{index=29}
+
+---
+
+SECTION: Election Monitoring
+
+RULE:
+Micro observers are deployed to ensure fair polling and monitor critical activities. :contentReference[oaicite:30]{index=30}
+
+---
+
+SECTION: Election Expenditure
+
+RULE:
+Candidates must not exceed prescribed expenditure limits. :contentReference[oaicite:31]{index=31}
+
+RULE:
+Candidates must submit election expense reports within 30 days of result. :contentReference[oaicite:32]{index=32}
+
+RULE:
+Failure to submit expense report can lead to disqualification for up to 3 years. :contentReference[oaicite:33]{index=33}
+
+---

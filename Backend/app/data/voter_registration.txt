@@ -1,0 +1,7 @@
+TITLE: Voter Registration (India)
+
+SOURCE: Placeholder for the verified India-only voter registration knowledge base.
+
+SECTION: Registration
+RULE:
+Add verified Form 6, EPIC, Aadhaar, residence proof, and declaration rules here.

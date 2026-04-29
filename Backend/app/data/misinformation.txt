@@ -1,0 +1,187 @@
+TITLE: Election Myths, Reality & Verified Facts (India)
+
+SOURCE: Election Commission of India (ECI), PIB Fact Check
+
+---
+
+SECTION: Voting Eligibility
+
+MYTH:
+A person not in voter list can vote using ID proof.
+
+REALITY:
+Only individuals listed in the electoral roll can vote. Identity is verified against the roll at polling station.
+
+---
+
+MYTH:
+If name is missing, you can use "Challenge Vote" to vote.
+
+REALITY:
+Challenge vote is only for identity disputes of registered voters. It cannot be used by unregistered individuals.
+
+---
+
+SECTION: Home Voting & Postal Ballots
+
+MYTH:
+Political party agents cannot accompany polling teams during home voting.
+
+REALITY:
+Authorized representatives of recognized political parties can be present with proper authorization (Form 10).
+
+---
+
+MYTH:
+Secrecy of vote is compromised in home voting.
+
+REALITY:
+Strict protocols including supervision and verification ensure secrecy of voting.
+
+---
+
+MYTH:
+Postal ballots are unreliable.
+
+REALITY:
+Postal ballots are officially regulated and used by service voters, PwDs, and senior citizens (80+).
+
+---
+
+SECTION: Polling Station Facilities
+
+MYTH:
+Polling stations lack basic facilities.
+
+REALITY:
+All polling stations provide Assured Minimum Facilities (AMF):
+- Drinking water
+- Waiting area
+- Toilets
+- Lighting
+- Ramp access
+- Voting compartments :contentReference[oaicite:0]{index=0}
+
+---
+
+MYTH:
+Polling stations are inaccessible.
+
+REALITY:
+Polling stations are designed with ramps and ground-floor access for accessibility.
+
+---
+
+SECTION: Digital Services
+
+MYTH:
+Saksham ECI app is not useful.
+
+REALITY:
+It provides:
+- Registration
+- Correction
+- Migration
+- Aadhaar authentication
+- Polling station details
+- Complaint services
+
+---
+
+SECTION: Identity & Documents
+
+MYTH:
+Disability card (UDID) cannot be used.
+
+REALITY:
+UDID is a valid identification document for voting.
+
+---
+
+SECTION: Election Rules Misconceptions
+
+MYTH:
+Repoll happens if tender votes exceed 14%.
+
+REALITY:
+No such rule exists. Repoll is governed by legal provisions under election law.
+
+---
+
+MYTH:
+Money is deducted if a person does not vote.
+
+REALITY:
+Voting is not compulsory in India. No penalties exist. :contentReference[oaicite:1]{index=1}
+
+---
+
+SECTION: EVM & Voting System
+
+MYTH:
+EVMs can be hacked.
+
+REALITY:
+EVMs are standalone machines not connected to networks. Claims of hacking are misleading.
+
+---
+
+MYTH:
+Voters can vote multiple times.
+
+REALITY:
+Indelible ink and voter verification prevent multiple voting. :contentReference[oaicite:2]{index=2}
+
+---
+
+SECTION: Fake News & Disinformation Cases
+
+CASE:
+Fake election schedule circulated on WhatsApp.
+
+FACT:
+Election schedules are announced officially via ECI press conferences. :contentReference[oaicite:3]{index=3}
+
+---
+
+CASE:
+Video showing election rigging shared online.
+
+FACT:
+The video was unrelated or from old elections and falsely linked to current elections. :contentReference[oaicite:4]{index=4}
+
+---
+
+CASE:
+Claim of duplicate voting using artificial fingers.
+
+FACT:
+The image was unrelated and falsely used. No such practice exists. :contentReference[oaicite:5]{index=5}
+
+---
+
+CASE:
+Claim of 100%+ voter turnout.
+
+FACT:
+Higher turnout occurred due to inclusion of election duty voters (EDC), not fraud. :contentReference[oaicite:6]{index=6}
+
+---
+
+CASE:
+Claim that indelible ink is made from animal fat.
+
+FACT:
+Indelible ink is made using silver nitrate and is scientifically developed. :contentReference[oaicite:7]{index=7}
+
+---
+
+SECTION: Election Authority Clarification
+
+FACT:
+Election Commission of India is responsible for conducting national and state elections.
+
+FACT:
+Local body elections are conducted by State Election Commissions, not ECI. :contentReference[oaicite:8]{index=8}
+
+---

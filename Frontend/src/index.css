@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-primary: #211B5F;
+  --color-primary-dark: #160E55;
+  --color-secondary: #E31E24;
+  --color-background: #F8FAFC;
+  --color-on-background: #0f172a;
+  --color-surface: #FFFFFF;
+  --color-surface-variant: #F8FAFC;
+  --color-on-surface: #0f172a;
+  --color-on-surface-variant: #475569;
+  --color-border-subtle: #E2E8F0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply min-h-screen bg-background font-sans text-on-background antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
+::selection {
+  background: rgba(33, 27, 95, 0.15);
+}
