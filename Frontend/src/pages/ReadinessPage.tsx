@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Gauge, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, RotateCcw } from 'lucide-react';
 import { readinessScore, toApiAssetUrl } from '../lib/api';
 import { clamp, prettyLabel } from '../lib/utils';
 import { StatusPill } from '../components/StatusPill';
@@ -62,15 +62,28 @@ export function ReadinessPage() {
     setState((current) => ({ ...current, [key]: !current[key] }));
   }
 
+  function onReset() {
+    setState(initialState);
+    setScore(null);
+    setLabel('');
+    setResultText('');
+    setBreakdown({});
+    setAudio('');
+    setError('');
+  }
+
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_0.82fr]">
       <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="flex items-center gap-3">
-          <Gauge className="h-6 w-6 text-[#211B5F]" />
-          <div>
-            <h1 className="text-3xl font-black text-slate-950">Readiness Score</h1>
-            <p className="text-sm text-slate-600">Route: <code className="rounded bg-slate-100 px-1.5 py-0.5">POST /readiness-score</code></p>
-          </div>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-2xl font-black text-slate-950">Readiness Score</h1>
+          <button
+            onClick={onReset}
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Reset
+          </button>
         </div>
 
         <div className="mt-5 space-y-3">
@@ -102,7 +115,14 @@ export function ReadinessPage() {
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <select
             value={lang}
-            onChange={(e) => setLang(e.target.value as LanguageCode)}
+            onChange={(e) => {
+              const nextLang = e.target.value as LanguageCode;
+              setLang(nextLang);
+              if (nextLang !== 'en') {
+                setVoice(false);
+                setAudio('');
+              }
+            }}
             className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700"
           >
             <option value="en">English</option>
@@ -116,8 +136,9 @@ export function ReadinessPage() {
             <input
               type="checkbox"
               checked={voice}
+              disabled={lang !== 'en'}
               onChange={(e) => setVoice(e.target.checked)}
-              className="h-4 w-4 accent-[#211B5F]"
+              className="h-4 w-4 accent-[#211B5F] disabled:cursor-not-allowed disabled:opacity-50"
             />
             Voice
           </label>

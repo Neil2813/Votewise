@@ -88,19 +88,17 @@ export function ChatPage() {
     <div className="min-h-screen bg-[#f8fafc] px-4 py-6 md:px-6 md:py-8">
       <div className="mx-auto max-w-3xl space-y-5">
         <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm md:p-6">
-          <p className="text-sm font-semibold tracking-[0.18em] text-[#211B5F]">
-            VOTEWISE AI
-          </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 md:text-4xl">
-            Election Coach
-          </h1>
-          <p className="mt-3 text-base leading-7 text-slate-600">
-            A clean space to ask election questions, understand the rules, and get
-            straightforward answers without the noise.
-          </p>
-        </div>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h1 className="text-2xl font-black text-slate-950">Election Coach</h1>
+            <button
+              onClick={resetChat}
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reset
+            </button>
+          </div>
 
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm md:p-6">
           <div className="space-y-4">
             {visibleMessages.map((message, index) => (
               <div
@@ -156,20 +154,20 @@ export function ChatPage() {
                   Send
                 </button>
 
-                <button
-                  onClick={resetChat}
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                  Reset
-                </button>
               </div>
             </div>
 
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <select
                 value={lang}
-                onChange={(e) => setLang(e.target.value as LanguageCode)}
+                onChange={(e) => {
+                  const nextLang = e.target.value as LanguageCode;
+                  setLang(nextLang);
+                  if (nextLang !== 'en') {
+                    setVoice(false);
+                    setAudio('');
+                  }
+                }}
                 className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"
               >
                 <option value="en">English</option>
@@ -183,8 +181,9 @@ export function ChatPage() {
                 <input
                   type="checkbox"
                   checked={voice}
+                  disabled={lang !== 'en'}
                   onChange={(e) => setVoice(e.target.checked)}
-                  className="h-4 w-4 accent-[#211B5F]"
+                  className="h-4 w-4 accent-[#211B5F] disabled:cursor-not-allowed disabled:opacity-50"
                 />
                 Voice
               </label>

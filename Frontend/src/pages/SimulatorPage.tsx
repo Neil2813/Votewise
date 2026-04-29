@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MonitorPlay, ArrowRight, CheckCircle2, UserCheck, Vote, LockKeyhole } from 'lucide-react';
+import { ArrowRight, LockKeyhole, RotateCcw, UserCheck, Vote } from 'lucide-react';
 import { simulate, isApiError } from '../lib/api';
 import { StatusPill } from '../components/StatusPill';
 
@@ -50,6 +50,16 @@ export function SimulatorPage() {
     validate('confirmation');
   }
 
+  function onReset() {
+    setStep('identity');
+    setFullName('');
+    setVoterId('');
+    setCandidate('');
+    setConfirmed(false);
+    setMessage('Start with the identity step.');
+    setMode('backend');
+  }
+
   const cards = [
     { key: 'identity', title: 'Identity verification', icon: UserCheck },
     { key: 'selection', title: 'Candidate selection', icon: Vote },
@@ -59,12 +69,15 @@ export function SimulatorPage() {
   return (
     <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
       <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="flex items-center gap-3">
-          <MonitorPlay className="h-6 w-6 text-[#211B5F]" />
-          <div>
-            <h1 className="text-3xl font-black text-slate-950">Voting Simulator</h1>
-            <p className="text-sm text-slate-600">Route: <code className="rounded bg-slate-100 px-1.5 py-0.5">POST /simulate</code></p>
-          </div>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-2xl font-black text-slate-950">Voting Simulator</h1>
+          <button
+            onClick={onReset}
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Reset
+          </button>
         </div>
 
         <div className="mt-6 grid gap-3 md:grid-cols-3">

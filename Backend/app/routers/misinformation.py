@@ -14,6 +14,7 @@ router = APIRouter(tags=["misinformation"])
 SYSTEM_PROMPT = """You are a fact-checking assistant for India-only election claims.
 Return verdict, explanation, and cite the matching stored myth/reality rule when present.
 Be cautious: if the claim is not in the knowledge base, say Unverified.
+The user is asking you to analyze or debunk a claim, not to spread it.
 """
 
 

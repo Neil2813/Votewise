@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { WandSparkles, BookOpen, ShieldCheck } from 'lucide-react';
+import { RotateCcw, WandSparkles } from 'lucide-react';
 import { generateGuide, isApiError, toApiAssetUrl } from '../lib/api';
 import type { LanguageCode } from '../lib/types';
 
@@ -39,47 +39,30 @@ export function GuidePage() {
     }
   }
 
+  function onReset() {
+    setTopic('India election process');
+    setAudience('general voter');
+    setGuide('');
+    setAudio('');
+    setError('');
+  }
+
   return (
     <div className="min-h-screen bg-[#f8fafc] px-4 py-6 md:px-6 md:py-8">
       <div className="mx-auto max-w-6xl space-y-6">
-        <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#211B5F]/5 px-3 py-1 text-xs font-semibold text-[#211B5F]">
-                <ShieldCheck className="h-4 w-4" />
-                Clean guide builder
-              </div>
-              <div className="flex items-center gap-3">
-                <BookOpen className="h-7 w-7 text-[#211B5F]" />
-                <div>
-                  <h1 className="text-3xl font-black tracking-tight text-slate-950 md:text-4xl">
-                    Guide Generator
-                  </h1>
-                  <p className="mt-2 text-base leading-7 text-slate-600">
-                    Create a clear, organized election guide in a calm light layout.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={onGenerate}
-              disabled={loading}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#211B5F] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <WandSparkles className="h-4 w-4" />
-              {loading ? 'Generating...' : 'Generate guide'}
-            </button>
-          </div>
-        </section>
-
         <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
           <div className="space-y-6">
             <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-slate-950">Guide inputs</h2>
-              <p className="mt-1 text-sm text-slate-600">
-                Choose a topic and audience, then generate the guide.
-              </p>
+              <div className="flex items-center justify-between gap-3">
+                <h1 className="text-2xl font-black text-slate-950">Guide Generator</h1>
+                <button
+                  onClick={onReset}
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Reset
+                </button>
+              </div>
 
               <div className="mt-5 space-y-4">
                 <div>
@@ -109,7 +92,14 @@ export function GuidePage() {
                 <div className="flex flex-wrap items-center gap-3">
                   <select
                     value={lang}
-                    onChange={(e) => setLang(e.target.value as LanguageCode)}
+                    onChange={(e) => {
+                      const nextLang = e.target.value as LanguageCode;
+                      setLang(nextLang);
+                      if (nextLang !== 'en') {
+                        setVoice(false);
+                        setAudio('');
+                      }
+                    }}
                     className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700"
                   >
                     <option value="en">English</option>
@@ -123,8 +113,9 @@ export function GuidePage() {
                     <input
                       type="checkbox"
                       checked={voice}
+                      disabled={lang !== 'en'}
                       onChange={(e) => setVoice(e.target.checked)}
-                      className="h-4 w-4 accent-[#211B5F]"
+                      className="h-4 w-4 accent-[#211B5F] disabled:cursor-not-allowed disabled:opacity-50"
                     />
                     Voice
                   </label>
@@ -150,6 +141,15 @@ export function GuidePage() {
                 ))}
               </div>
             </section>
+
+            <button
+              onClick={onGenerate}
+              disabled={loading}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#211B5F] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <WandSparkles className="h-4 w-4" />
+              {loading ? 'Generating...' : 'Generate guide'}
+            </button>
 
             {error ? (
               <section className="rounded-[2rem] border border-rose-200 bg-rose-50 p-5 text-sm font-medium text-rose-700 shadow-sm">

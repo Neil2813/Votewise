@@ -1,5 +1,4 @@
-import { useMemo } from 'react';
-import { Bot, Globe, ShieldAlert, ShieldCheck, Sparkles, Vote, ClipboardList, MessageSquareText, Scale, BadgeAlert, Gauge, MonitorPlay } from 'lucide-react';
+import { ShieldCheck, Vote, ClipboardList, MessageSquareText, Scale, BadgeAlert, Gauge, MonitorPlay } from 'lucide-react';
 import type { PageKey } from '../lib/types';
 import { cx } from '../lib/utils';
 
@@ -24,12 +23,6 @@ export function Layout({
   healthState: 'loading' | 'healthy' | 'degraded';
   children: React.ReactNode;
 }) {
-  const statusLabel = useMemo(() => {
-    if (healthState === 'healthy') return 'Backend connected';
-    if (healthState === 'degraded') return 'Backend unavailable';
-    return 'Checking backend...';
-  }, [healthState]);
-
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_28%,#f8fafc_100%)] text-slate-900">
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur">
@@ -48,20 +41,7 @@ export function Layout({
             </span>
           </button>
 
-          <div className="hidden items-center gap-3 lg:flex">
-            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700">
-              {healthState === 'healthy' ? <ShieldCheck className="h-4 w-4 text-emerald-600" /> : healthState === 'degraded' ? <ShieldAlert className="h-4 w-4 text-rose-600" /> : <Sparkles className="h-4 w-4 text-slate-600" />}
-              {statusLabel}
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700">
-              <Globe className="h-4 w-4 text-[#211B5F]" />
-              India-only scope
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700">
-              <Bot className="h-4 w-4 text-[#E31E24]" />
-              Retrieval first
-            </span>
-          </div>
+          <div className="hidden lg:block" aria-hidden="true" />
         </div>
 
         <nav className="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-4 pb-4 md:px-6">

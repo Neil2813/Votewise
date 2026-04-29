@@ -17,13 +17,16 @@ MANIPULATION_PATTERNS = [
     r"support \w+ party",
     r"spread misinformation",
     r"mislead voters",
-    r"evm hack",
+    r"how to hack (an )?evm",
+    r"hack (an )?evm to",
 ]
 
 
 def detect_non_india_request(text: str) -> bool:
     lowered = text.lower()
-    return any(country in lowered for country in INDIA_ONLY_DISALLOWED_COUNTRIES) and "india" not in lowered
+    if re.search(r"\bindia\b", lowered):
+        return False
+    return any(re.search(rf"\b{re.escape(country)}\b", lowered) for country in INDIA_ONLY_DISALLOWED_COUNTRIES)
 
 
 def is_blocked_politically(text: str) -> bool:
