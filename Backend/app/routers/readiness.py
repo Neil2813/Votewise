@@ -12,11 +12,12 @@ router = APIRouter(tags=["readiness"])
 @router.post("/readiness-score", response_model=StandardResponse)
 async def readiness_score(payload: ReadinessRequest) -> StandardResponse:
     score, label, breakdown, missing = compute_readiness(payload.model_dump())
+    completed = [key.replace("_", " ") for key, value in breakdown.items() if value]
     raw_result = (
         f"Readiness score: {score}%\n"
         f"Status: {label}\n\n"
         "Completed:\n"
-        + "\n".join(f"- {key.replace('_', ' ')}: {'yes' if value else 'no'}" for key, value in breakdown.items())
+        + ("\n".join(f"- {item}" for item in completed) if completed else "- Nothing completed yet")
         + "\n\nMissing steps:\n"
         + ("\n".join(f"- {item}" for item in missing) if missing else "- None")
     )
@@ -33,7 +34,7 @@ async def readiness_score(payload: ReadinessRequest) -> StandardResponse:
         use_voice=payload.voice,
         prompt=prompt,
         fallback_text=raw_result,
-        format_instruction="Start with the score and status, then list missing steps.",
+        format_instruction="Start with the score and status. In Completed, list only completed items. Do not show no/false items under Completed.",
     )
 
     return StandardResponse(data=ResponseData(**result))

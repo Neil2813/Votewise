@@ -5,7 +5,7 @@ from app.schemas.guide import GuideRequest
 from app.schemas.common import ResponseData, StandardResponse
 from app.core.policy import detect_non_india_request, safe_block_message
 from app.services.retrieval import kb
-from app.services.local_response import build_rule_answer
+from app.services.local_response import build_guide_answer
 from app.services.response_engine import clean_source_text, process_response
 
 router = APIRouter(tags=["guide"])
@@ -43,20 +43,7 @@ Retrieved knowledge:
 {context}
 """
 
-    fallback = (
-        "Eligibility\n"
-        "- Use verified India-only rules.\n\n"
-        "Registration\n"
-        "- Refer to the voter registration file when available.\n\n"
-        "Nomination\n"
-        "- Use the election rules file for nomination and oath requirements.\n\n"
-        "Poll-day process\n"
-        "- Follow poll-day rules from the election rules file.\n\n"
-        "Do's and don'ts\n"
-        "- Do stay neutral, follow official instructions, and avoid prohibited conduct."
-    )
-    if not hits:
-        fallback = build_rule_answer(topic, hits)
+    fallback = build_guide_answer(topic, hits)
 
     result = await process_response(
         user_query=topic,

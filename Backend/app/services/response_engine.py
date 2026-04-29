@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+import re
 from pathlib import Path
 
 from app.services.llm.orchestrator import llm_orchestrator
@@ -37,6 +38,7 @@ Rules:
 - Bullet points if needed
 - India-specific context only
 - No technical jargon
+- Do not include citations, indexes, contentReference markers, source placeholders, or raw database labels
 {f"- {instruction}" if instruction else ""}
 
 TEXT:
@@ -135,6 +137,7 @@ def _normalize_lang(lang: str | None) -> str:
 
 
 def clean_source_text(text: str) -> str:
+    text = _strip_artifacts(text)
     clean_lines: list[str] = []
     for raw_line in text.splitlines():
         line = raw_line.strip()
@@ -151,10 +154,11 @@ def clean_source_text(text: str) -> str:
         if source_index != -1:
             line = line[:source_index].strip()
         clean_lines.append(line)
-    return " ".join(clean_lines).strip()
+    return _strip_artifacts(" ".join(clean_lines)).strip()
 
 
 def clean_user_text(text: str) -> str:
+    text = _strip_artifacts(text)
     text = text.replace("Verified source-based summary:", "Here is a simple answer:")
     text = text.replace(
         "If the stored text is partial, the answer should be treated as a summary, not a legal opinion.",
@@ -178,6 +182,15 @@ def clean_user_text(text: str) -> str:
             line = line.split("Placeholder for the verified India-only", 1)[0].strip()
             if not line:
                 continue
-        lines.append(line)
+        lines.append(_strip_artifacts(line))
 
-    return "\n".join(lines).strip()
+    return _strip_artifacts("\n".join(lines)).strip()
+
+
+def _strip_artifacts(text: str) -> str:
+    text = re.sub(r":contentReference\[[^\]]+\]\{[^}]+\}", "", text)
+    text = re.sub(r"\[oaicite:[^\]]+\]\{[^}]+\}", "", text)
+    text = re.sub(r"\s+---+\s*", "\n", text)
+    text = re.sub(r"[ \t]{2,}", " ", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()

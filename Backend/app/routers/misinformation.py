@@ -40,12 +40,27 @@ Matched rule: ...
 """
 
     verdict, matched_rule = local_myth_response(claim)
-    fallback = (
-        f"Verdict: {verdict}\n\n"
-        "Explanation: This claim was checked against the stored misinformation file. "
-        "The claim is not fully verified by the current India-only knowledge base.\n\n"
-        f"Matched rule: {clean_source_text(matched.text) if matched else clean_source_text(matched_rule or '') or 'No matching stored rule found.'}"
-    )
+    matched_text = clean_source_text(matched.text) if matched else clean_source_text(matched_rule or "")
+    if verdict == "False":
+        fallback = (
+            "Verdict: False\n\n"
+            "Explanation: This claim is treated as false by the available India-only misinformation material. "
+            "Do not rely on it or forward it as election guidance.\n\n"
+            f"Matched rule: {matched_text or 'No matching stored rule found.'}"
+        )
+    elif verdict == "True":
+        fallback = (
+            "Verdict: True\n\n"
+            "Explanation: The available India-only material supports this claim.\n\n"
+            f"Matched rule: {matched_text or 'No matching stored rule found.'}"
+        )
+    else:
+        fallback = (
+            "Verdict: Unverified\n\n"
+            "Explanation: I could not confirm this claim from the current India-only misinformation material. "
+            "Treat it carefully and check official Election Commission of India information before sharing it.\n\n"
+            "Matched rule: No matching stored rule found."
+        )
 
     result = await process_response(
         user_query=claim,
