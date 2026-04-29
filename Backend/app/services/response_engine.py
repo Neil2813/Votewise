@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import uuid
 import re
+import os
+from contextlib import contextmanager
 from pathlib import Path
 
 from app.services.llm.orchestrator import llm_orchestrator
@@ -23,6 +25,14 @@ Format:
 """
 
 SUPPORTED_LANGUAGES = {"en", "hi", "ta", "te", "kn", "ml"}
+LANGUAGE_NAMES = {
+    "en": "English",
+    "hi": "Hindi",
+    "ta": "Tamil",
+    "te": "Telugu",
+    "kn": "Kannada",
+    "ml": "Malayalam",
+}
 AUDIO_DIR = Path(__file__).resolve().parents[1] / "generated_audio"
 
 
@@ -58,13 +68,71 @@ def translate_text(text: str, target_lang: str) -> str:
         return text
 
     try:
+        from deep_translator import GoogleTranslator
+
+        with _without_proxy_env():
+            translated = GoogleTranslator(source="auto", target=lang).translate(text)
+        if translated:
+            return translated
+    except Exception:
+        pass
+
+    try:
         from translate import Translator
 
-        translator = Translator(to_lang=lang)
-        translated = translator.translate(text)
+        with _without_proxy_env():
+            translator = Translator(to_lang=lang)
+            translated = translator.translate(text)
         return translated or text
     except Exception:
         return text
+
+
+async def translate_text_with_llm_fallback(text: str, target_lang: str) -> str:
+    lang = _normalize_lang(target_lang)
+    if lang == "en":
+        return text
+
+    translated = clean_user_text(translate_text(text, lang))
+    if translated and not _looks_untranslated(text, translated, lang):
+        return translated
+
+    language_name = LANGUAGE_NAMES[lang]
+    prompt = f"""Translate the following answer into {language_name}.
+
+Rules:
+- Keep the meaning accurate.
+- Keep election terms understandable for Indian users.
+- Plain text only.
+- Do not add Markdown symbols, citations, indexes, or source labels.
+- Preserve short paragraphs and simple bullet points.
+- Return only the translated answer.
+
+TEXT:
+{text}
+"""
+    translation_system = (
+        "You are a professional translator for an India election education app. "
+        "Translate user-facing educational text accurately. Return only the translated text."
+    )
+    llm_translation, provider = await generate_with_fallback(prompt, system=translation_system)
+    llm_translation = clean_user_text(llm_translation)
+    if provider != "local-failure" and llm_translation and not _looks_untranslated(text, llm_translation, lang):
+        return llm_translation
+
+    force_prompt = f"""The previous output was not translated.
+Translate this text into {language_name} now.
+Return only {language_name} text, using the native script where applicable.
+
+TEXT:
+{text}
+"""
+    forced_translation, forced_provider = await generate_with_fallback(force_prompt, system=translation_system)
+    forced_translation = clean_user_text(forced_translation)
+    if forced_provider != "local-failure" and forced_translation and not _looks_untranslated(text, forced_translation, lang):
+        return forced_translation
+
+    return translated or text
 
 
 def text_to_speech(text: str, lang: str = "en") -> str | None:
@@ -121,7 +189,7 @@ Retrieved knowledge:
     response = clean_user_text(response)
     formatted = await format_with_llm(response, instruction=format_instruction)
     formatted = clean_user_text(formatted)
-    translated = translate_text(formatted, lang)
+    translated = await translate_text_with_llm_fallback(formatted, lang)
 
     audio_file = None
     if use_voice:
@@ -136,6 +204,42 @@ Retrieved knowledge:
 def _normalize_lang(lang: str | None) -> str:
     normalized = (lang or "en").strip().lower()
     return normalized if normalized in SUPPORTED_LANGUAGES else "en"
+
+
+def _looks_untranslated(original: str, translated: str, lang: str) -> bool:
+    if lang == "en":
+        return False
+    original_compact = re.sub(r"\s+", " ", original).strip().lower()
+    translated_compact = re.sub(r"\s+", " ", translated).strip().lower()
+    if translated_compact == original_compact:
+        return True
+    if _latin_ratio(translated) > 0.85:
+        return True
+    return False
+
+
+def _latin_ratio(text: str) -> float:
+    letters = [char for char in text if char.isalpha()]
+    if not letters:
+        return 1.0
+    latin_letters = [char for char in letters if "a" <= char.lower() <= "z"]
+    return len(latin_letters) / len(letters)
+
+
+@contextmanager
+def _without_proxy_env():
+    proxy_keys = ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "http_proxy", "https_proxy", "all_proxy")
+    previous = {key: os.environ.get(key) for key in proxy_keys}
+    try:
+        for key in proxy_keys:
+            os.environ.pop(key, None)
+        yield
+    finally:
+        for key, value in previous.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
 
 
 def clean_source_text(text: str) -> str:
