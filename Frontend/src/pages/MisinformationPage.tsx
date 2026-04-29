@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { BadgeAlert, Search, ShieldCheck, ShieldQuestion, ShieldX, RotateCcw } from 'lucide-react';
-import { misinformationCheck, isApiError } from '../lib/api';
+import { misinformationCheck, isApiError, toApiAssetUrl } from '../lib/api';
 import { StatusPill } from '../components/StatusPill';
+import type { LanguageCode } from '../lib/types';
 
 const claimSamples = [
   'A person not in the voter list can vote using ID proof.',
@@ -12,10 +13,12 @@ const claimSamples = [
 
 export function MisinformationPage() {
   const [claim, setClaim] = useState('');
+  const [lang, setLang] = useState<LanguageCode>('en');
+  const [voice, setVoice] = useState(false);
   const [verdict, setVerdict] = useState<'True' | 'False' | 'Unverified' | ''>('');
   const [explanation, setExplanation] = useState('');
   const [matchedRule, setMatchedRule] = useState('');
-  const [mode, setMode] = useState('local');
+  const [audio, setAudio] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -36,11 +39,12 @@ export function MisinformationPage() {
     setError('');
 
     try {
-      const response = await misinformationCheck(input);
-      setVerdict(response.verdict);
-      setExplanation(response.explanation);
-      setMatchedRule(response.matched_rule || '');
-      setMode(response.mode);
+      const response = await misinformationCheck(input, lang, voice);
+      const text = response.data.text;
+      setVerdict(extractVerdict(text));
+      setExplanation(text);
+      setMatchedRule('');
+      setAudio(toApiAssetUrl(response.data.audio));
     } catch (err) {
       setError(isApiError(err) ? err.message : 'Failed to verify the claim.');
     } finally {
@@ -53,7 +57,7 @@ export function MisinformationPage() {
     setVerdict('');
     setExplanation('');
     setMatchedRule('');
-    setMode('local');
+    setAudio('');
     setError('');
   }
 
@@ -78,7 +82,6 @@ export function MisinformationPage() {
 
             <div className="flex flex-wrap items-center gap-2">
               <StatusPill label={verdict || 'waiting'} tone={tone} />
-              <StatusPill label={mode} tone="neutral" />
               <button
                 onClick={onReset}
                 className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
@@ -120,6 +123,30 @@ export function MisinformationPage() {
                     {item}
                   </button>
                 ))}
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <select
+                  value={lang}
+                  onChange={(e) => setLang(e.target.value as LanguageCode)}
+                  className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700"
+                >
+                  <option value="en">English</option>
+                  <option value="hi">Hindi</option>
+                  <option value="ta">Tamil</option>
+                  <option value="te">Telugu</option>
+                  <option value="kn">Kannada</option>
+                  <option value="ml">Malayalam</option>
+                </select>
+                <label className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={voice}
+                    onChange={(e) => setVoice(e.target.checked)}
+                    className="h-4 w-4 accent-[#211B5F]"
+                  />
+                  Voice
+                </label>
               </div>
 
               <div className="mt-5 flex flex-wrap gap-3">
@@ -170,6 +197,7 @@ export function MisinformationPage() {
             </div>
 
             <div className="mt-5 min-h-[480px] rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5">
+              {audio ? <audio controls src={audio} className="mb-4 h-9 w-full" /> : null}
               <div className="flex items-center gap-3">
                 {verdict === 'True' ? (
                   <ShieldCheck className="h-6 w-6 text-emerald-600" />
@@ -202,4 +230,11 @@ export function MisinformationPage() {
       </div>
     </div>
   );
+}
+
+function extractVerdict(text: string): 'True' | 'False' | 'Unverified' {
+  const lower = text.toLowerCase();
+  if (lower.includes('verdict: true') || lower.includes('verdict - true')) return 'True';
+  if (lower.includes('verdict: false') || lower.includes('verdict - false')) return 'False';
+  return 'Unverified';
 }

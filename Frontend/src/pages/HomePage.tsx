@@ -7,8 +7,15 @@ import {
   MonitorPlay,
   Landmark,
 } from 'lucide-react';
+import type { HealthResponse, PageKey } from '../lib/types';
 
-export function HomePage({ onNavigate }: { onNavigate: (page: any) => void }) {
+export function HomePage({
+  onNavigate,
+}: {
+  onNavigate: (page: PageKey) => void;
+  health?: HealthResponse | null;
+  sourcesCount?: number;
+}) {
   return (
     <div className="min-h-screen bg-[#f8fafc] px-6 py-10">
       

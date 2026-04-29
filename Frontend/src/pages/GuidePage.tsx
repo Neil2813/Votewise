@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { WandSparkles, BookOpen, ShieldCheck } from 'lucide-react';
-import { generateGuide, isApiError } from '../lib/api';
+import { generateGuide, isApiError, toApiAssetUrl } from '../lib/api';
+import type { LanguageCode } from '../lib/types';
 
 const topicPresets = [
   'India election process',
@@ -15,7 +16,10 @@ const topicPresets = [
 export function GuidePage() {
   const [topic, setTopic] = useState('India election process');
   const [audience, setAudience] = useState('general voter');
+  const [lang, setLang] = useState<LanguageCode>('en');
+  const [voice, setVoice] = useState(false);
   const [guide, setGuide] = useState('');
+  const [audio, setAudio] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -25,8 +29,9 @@ export function GuidePage() {
     setError('');
 
     try {
-      const response = await generateGuide(topic.trim(), audience.trim());
-      setGuide(response.guide);
+      const response = await generateGuide(topic.trim(), audience.trim(), lang, voice);
+      setGuide(response.data.text);
+      setAudio(toApiAssetUrl(response.data.audio));
     } catch (err) {
       setError(isApiError(err) ? err.message : 'Failed to generate guide.');
     } finally {
@@ -100,6 +105,30 @@ export function GuidePage() {
                     placeholder="e.g. first-time voter"
                   />
                 </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <select
+                    value={lang}
+                    onChange={(e) => setLang(e.target.value as LanguageCode)}
+                    className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700"
+                  >
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="ta">Tamil</option>
+                    <option value="te">Telugu</option>
+                    <option value="kn">Kannada</option>
+                    <option value="ml">Malayalam</option>
+                  </select>
+                  <label className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={voice}
+                      onChange={(e) => setVoice(e.target.checked)}
+                      className="h-4 w-4 accent-[#211B5F]"
+                    />
+                    Voice
+                  </label>
+                </div>
               </div>
             </section>
 
@@ -143,6 +172,7 @@ export function GuidePage() {
             </div>
 
             <div className="mt-5 min-h-[460px] rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5">
+              {audio ? <audio controls src={audio} className="mb-4 h-9 w-full" /> : null}
               {guide ? (
                 <div className="whitespace-pre-wrap text-sm leading-7 text-slate-800">
                   {guide}

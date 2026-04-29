@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Gauge, CheckCircle2 } from 'lucide-react';
-import { readinessScore } from '../lib/api';
+import { readinessScore, toApiAssetUrl } from '../lib/api';
 import { clamp, prettyLabel } from '../lib/utils';
 import { StatusPill } from '../components/StatusPill';
+import type { LanguageCode } from '../lib/types';
 
 type ReadinessFields = {
   registration_done: boolean;
@@ -24,10 +25,13 @@ const initialState: ReadinessFields = {
 
 export function ReadinessPage() {
   const [state, setState] = useState<ReadinessFields>(initialState);
+  const [lang, setLang] = useState<LanguageCode>('en');
+  const [voice, setVoice] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [label, setLabel] = useState('');
-  const [missing, setMissing] = useState<string[]>([]);
+  const [resultText, setResultText] = useState('');
   const [breakdown, setBreakdown] = useState<Record<string, boolean>>({});
+  const [audio, setAudio] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -41,11 +45,12 @@ export function ReadinessPage() {
     setLoading(true);
     setError('');
     try {
-      const response = await readinessScore(state);
-      setScore(response.score);
-      setLabel(response.label);
-      setMissing(response.missing);
-      setBreakdown(response.breakdown);
+      const response = await readinessScore({ ...state, lang, voice });
+      setScore(completion);
+      setLabel(readinessLabel(completion));
+      setBreakdown(state);
+      setResultText(response.data.text);
+      setAudio(toApiAssetUrl(response.data.audio));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to compute readiness.');
     } finally {
@@ -94,6 +99,30 @@ export function ReadinessPage() {
           Compute readiness
         </button>
 
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <select
+            value={lang}
+            onChange={(e) => setLang(e.target.value as LanguageCode)}
+            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700"
+          >
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="ta">Tamil</option>
+            <option value="te">Telugu</option>
+            <option value="kn">Kannada</option>
+            <option value="ml">Malayalam</option>
+          </select>
+          <label className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
+            <input
+              type="checkbox"
+              checked={voice}
+              onChange={(e) => setVoice(e.target.checked)}
+              className="h-4 w-4 accent-[#211B5F]"
+            />
+            Voice
+          </label>
+        </div>
+
         {error ? <p className="mt-3 text-sm font-medium text-rose-700">{error}</p> : null}
       </section>
 
@@ -124,10 +153,20 @@ export function ReadinessPage() {
           </div>
 
           <div className="mt-5 rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
-            <span className="font-semibold">Missing steps:</span> {missing.length ? missing.join(', ') : 'None'}
+            {audio ? <audio controls src={audio} className="mb-4 h-9 w-full" /> : null}
+            <p className="whitespace-pre-wrap leading-7">
+              {resultText || 'Your formatted readiness result will appear here.'}
+            </p>
           </div>
         </section>
       </aside>
     </div>
   );
+}
+
+function readinessLabel(score: number): string {
+  if (score >= 90) return 'Fully Ready';
+  if (score >= 70) return 'Mostly Ready';
+  if (score >= 50) return 'Partially Ready';
+  return 'Not Ready';
 }

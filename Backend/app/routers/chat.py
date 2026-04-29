@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
-from app.schemas.chat import ChatRequest, ChatResponse
+from app.schemas.chat import ChatRequest
+from app.schemas.common import ResponseData, StandardResponse
 from app.core.policy import detect_non_india_request, is_blocked_politically, safe_block_message
 from app.services.retrieval import kb
 from app.services.local_response import build_rule_answer
-from app.services.llm.orchestrator import llm_orchestrator
+from app.services.response_engine import process_response
 
 router = APIRouter(tags=["chat"])
 
@@ -21,8 +22,8 @@ Rules:
 """
 
 
-@router.post("/chat", response_model=ChatResponse)
-async def chat(payload: ChatRequest) -> ChatResponse:
+@router.post("/chat", response_model=StandardResponse)
+async def chat(payload: ChatRequest) -> StandardResponse:
     q = payload.question.strip()
     if detect_non_india_request(q) or is_blocked_politically(q):
         raise HTTPException(status_code=400, detail=safe_block_message())
@@ -48,12 +49,14 @@ Retrieved knowledge:
 Answer in 1-6 short paragraphs. Mention uncertainty when needed.
 """
 
-    answer, provider = await llm_orchestrator.generate(SYSTEM_PROMPT, prompt)
-    mode = provider
-    verified = bool(hits)
+    result = await process_response(
+        user_query=q,
+        rag_context=context,
+        lang=payload.lang,
+        use_voice=payload.voice,
+        system=SYSTEM_PROMPT,
+        prompt=prompt,
+        fallback_text=build_rule_answer(q, hits),
+    )
 
-    if provider == "local-failure":
-        answer = build_rule_answer(q, hits)
-        mode = "local-template"
-
-    return ChatResponse(answer=answer, mode=mode, verified=verified, sources=hits[:4])
+    return StandardResponse(data=ResponseData(**result))

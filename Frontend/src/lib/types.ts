@@ -39,39 +39,27 @@ export interface SourcesResponse {
   sources: string[];
 }
 
-export interface ChatResponse {
-  answer: string;
-  mode: string;
-  verified: boolean;
-  sources: SourceHit[];
+export type LanguageCode = 'en' | 'hi' | 'ta' | 'te' | 'kn' | 'ml';
+
+export interface ResponseData {
+  text: string;
+  audio?: string | null;
 }
 
-export interface GuideResponse {
-  guide: string;
-  mode: string;
-  sources: SourceHit[];
+export interface StandardResponse {
+  status: 'success';
+  data: ResponseData;
 }
 
-export interface CompareResponse {
-  summary: string;
-  mode: string;
-  sources: SourceHit[];
-}
+export type ChatResponse = StandardResponse;
 
-export interface MisinformationResponse {
-  verdict: 'True' | 'False' | 'Unverified';
-  explanation: string;
-  matched_rule?: string | null;
-  sources: SourceHit[];
-  mode: string;
-}
+export type GuideResponse = StandardResponse;
 
-export interface ReadinessResponse {
-  score: number;
-  label: string;
-  breakdown: Record<string, boolean>;
-  missing: string[];
-}
+export type CompareResponse = StandardResponse;
+
+export type MisinformationResponse = StandardResponse;
+
+export type ReadinessResponse = StandardResponse;
 
 export interface SimulateResponse {
   ok: boolean;

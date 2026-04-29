@@ -10,6 +10,8 @@ Verdict = Literal["True", "False", "Unverified"]
 
 class MisinformationRequest(BaseModel):
     claim: str = Field(..., min_length=1)
+    lang: str = "en"
+    voice: bool = False
 
 
 class MisinformationResponse(BaseModel):

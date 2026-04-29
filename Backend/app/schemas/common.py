@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, Field
-from typing import Any
 
 
 class SourceHit(BaseModel):
@@ -15,3 +14,13 @@ class SourceHit(BaseModel):
 class ErrorResponse(BaseModel):
     detail: str
     code: str | None = None
+
+
+class ResponseData(BaseModel):
+    text: str
+    audio: str | None = None
+
+
+class StandardResponse(BaseModel):
+    status: str = "success"
+    data: ResponseData

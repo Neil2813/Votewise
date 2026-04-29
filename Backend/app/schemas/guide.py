@@ -7,6 +7,8 @@ from .common import SourceHit
 class GuideRequest(BaseModel):
     topic: str = Field(default="India election process", min_length=1)
     audience: str | None = None
+    lang: str = "en"
+    voice: bool = False
 
 
 class GuideResponse(BaseModel):

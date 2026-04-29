@@ -8,6 +8,8 @@ class CompareRequest(BaseModel):
     left: str = Field(..., min_length=1)
     right: str = Field(..., min_length=1)
     context: str | None = None
+    lang: str = "en"
+    voice: bool = False
 
 
 class CompareResponse(BaseModel):

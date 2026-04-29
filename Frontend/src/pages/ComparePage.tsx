@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { Scale, ArrowRightLeft, RotateCcw } from 'lucide-react';
-import { compare, isApiError } from '../lib/api';
-import { StatusPill } from '../components/StatusPill';
+import { compare, isApiError, toApiAssetUrl } from '../lib/api';
+import type { LanguageCode } from '../lib/types';
 
 export function ComparePage() {
   const [left, setLeft] = useState('Eligibility rules');
   const [right, setRight] = useState('Nomination rules');
   const [context, setContext] = useState('India-only election education');
+  const [lang, setLang] = useState<LanguageCode>('en');
+  const [voice, setVoice] = useState(false);
   const [summary, setSummary] = useState('');
-  const [mode, setMode] = useState('local');
+  const [audio, setAudio] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -18,9 +20,9 @@ export function ComparePage() {
     setError('');
 
     try {
-      const response = await compare(left.trim(), right.trim(), context.trim() || undefined);
-      setSummary(response.summary);
-      setMode(response.mode);
+      const response = await compare(left.trim(), right.trim(), context.trim() || undefined, lang, voice);
+      setSummary(response.data.text);
+      setAudio(toApiAssetUrl(response.data.audio));
     } catch (err) {
       setError(isApiError(err) ? err.message : 'Failed to compare.');
     } finally {
@@ -38,7 +40,7 @@ export function ComparePage() {
     setRight('Nomination rules');
     setContext('India-only election education');
     setSummary('');
-    setMode('local');
+    setAudio('');
     setError('');
   }
 
@@ -61,7 +63,6 @@ export function ComparePage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <StatusPill label={mode} tone="neutral" />
               <button
                 onClick={onSwap}
                 className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
@@ -123,6 +124,30 @@ export function ComparePage() {
                 />
               </div>
 
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <select
+                  value={lang}
+                  onChange={(e) => setLang(e.target.value as LanguageCode)}
+                  className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700"
+                >
+                  <option value="en">English</option>
+                  <option value="hi">Hindi</option>
+                  <option value="ta">Tamil</option>
+                  <option value="te">Telugu</option>
+                  <option value="kn">Kannada</option>
+                  <option value="ml">Malayalam</option>
+                </select>
+                <label className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={voice}
+                    onChange={(e) => setVoice(e.target.checked)}
+                    className="h-4 w-4 accent-[#211B5F]"
+                  />
+                  Voice
+                </label>
+              </div>
+
               <div className="mt-5 flex flex-wrap gap-3">
                 <button
                   onClick={onCompare}
@@ -178,6 +203,7 @@ export function ComparePage() {
             </div>
 
             <div className="mt-5 min-h-[480px] rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5">
+              {audio ? <audio controls src={audio} className="mb-4 h-9 w-full" /> : null}
               {summary ? (
                 <div className="whitespace-pre-wrap text-sm leading-7 text-slate-800">
                   {summary}

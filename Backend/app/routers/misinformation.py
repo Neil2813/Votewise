@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
-from app.schemas.misinformation import MisinformationRequest, MisinformationResponse
+from app.schemas.misinformation import MisinformationRequest
+from app.schemas.common import ResponseData, StandardResponse
 from app.core.policy import detect_non_india_request, safe_block_message
 from app.services.retrieval import kb
-from app.services.llm.orchestrator import llm_orchestrator
 from app.services.rules import local_myth_response
+from app.services.response_engine import process_response
 
 router = APIRouter(tags=["misinformation"])
 
@@ -16,8 +17,8 @@ Be cautious: if the claim is not in the knowledge base, say Unverified.
 """
 
 
-@router.post("/misinformation-check", response_model=MisinformationResponse)
-async def misinformation_check(payload: MisinformationRequest) -> MisinformationResponse:
+@router.post("/misinformation-check", response_model=StandardResponse)
+async def misinformation_check(payload: MisinformationRequest) -> StandardResponse:
     claim = payload.claim.strip()
     if detect_non_india_request(claim):
         raise HTTPException(status_code=400, detail=safe_block_message())
@@ -37,44 +38,23 @@ Explanation: ...
 Matched rule: ...
 """
 
-    answer, provider = await llm_orchestrator.generate(SYSTEM_PROMPT, prompt)
     verdict, matched_rule = local_myth_response(claim)
-
-    if provider == "local-failure":
-        explanation = (
-            "This claim was checked against the stored misinformation file. "
-            "The claim is not fully verified by the current India-only knowledge base."
-        )
-        if verdict == "True" and matched_rule:
-            explanation = "The stored file marks this as a verified fact."
-        elif verdict == "False" and matched_rule:
-            explanation = "The stored file treats this as a myth or false claim."
-        return MisinformationResponse(
-            verdict=verdict,
-            explanation=explanation,
-            matched_rule=matched_rule,
-            sources=hits[:4],
-            mode="local-template",
-        )
-
-    # Try to extract a safer structured result from the model output
-    text = answer.strip()
-    final_verdict = "Unverified"
-    lower = text.lower()
-    if "verdict:" in lower:
-        for v in ("true", "false", "unverified"):
-            if f"verdict: {v}" in lower:
-                final_verdict = v.capitalize() if v != "unverified" else "Unverified"
-                break
-
-    explanation = text
-    if not explanation:
-        explanation = "The claim is not verified in the current India-only knowledge base."
-
-    return MisinformationResponse(
-        verdict=final_verdict,  # type: ignore[arg-type]
-        explanation=explanation,
-        matched_rule=matched.text if matched else matched_rule,
-        sources=hits[:4],
-        mode=provider,
+    fallback = (
+        f"Verdict: {verdict}\n\n"
+        "Explanation: This claim was checked against the stored misinformation file. "
+        "The claim is not fully verified by the current India-only knowledge base.\n\n"
+        f"Matched rule: {matched.text if matched else matched_rule or 'No matching stored rule found.'}"
     )
+
+    result = await process_response(
+        user_query=claim,
+        rag_context="\n".join(h.text for h in hits),
+        lang=payload.lang,
+        use_voice=payload.voice,
+        system=SYSTEM_PROMPT,
+        prompt=prompt,
+        fallback_text=fallback,
+        format_instruction="Use exactly these sections: Verdict, Explanation, Matched rule.",
+    )
+
+    return StandardResponse(data=ResponseData(**result))

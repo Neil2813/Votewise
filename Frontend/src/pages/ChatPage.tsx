@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Send, Sparkles, RotateCcw } from 'lucide-react';
-import { chat, isApiError } from '../lib/api';
-import type { ChatMessage } from '../lib/types';
+import { chat, isApiError, toApiAssetUrl } from '../lib/api';
+import type { ChatMessage, LanguageCode } from '../lib/types';
 
 const starterPrompts = [
   'Who can vote in India?',
@@ -12,6 +12,9 @@ const starterPrompts = [
 
 export function ChatPage() {
   const [question, setQuestion] = useState('');
+  const [lang, setLang] = useState<LanguageCode>('en');
+  const [voice, setVoice] = useState(false);
+  const [audio, setAudio] = useState('');
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -43,13 +46,16 @@ export function ChatPage() {
         nextMessages.slice(-6).map((m) => ({
           role: m.role,
           content: m.content,
-        }))
+        })),
+        lang,
+        voice
       );
 
       setMessages((current) => [
         ...current,
-        { role: 'assistant', content: response.answer },
+        { role: 'assistant', content: response.data.text },
       ]);
+      setAudio(toApiAssetUrl(response.data.audio));
     } catch (err) {
       const message = isApiError(err) ? err.message : 'Something went wrong.';
       setError(message);
@@ -75,6 +81,7 @@ export function ChatPage() {
       },
     ]);
     setError('');
+    setAudio('');
   }
 
   return (
@@ -157,6 +164,31 @@ export function ChatPage() {
                   Reset
                 </button>
               </div>
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <select
+                value={lang}
+                onChange={(e) => setLang(e.target.value as LanguageCode)}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"
+              >
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+                <option value="ta">Tamil</option>
+                <option value="te">Telugu</option>
+                <option value="kn">Kannada</option>
+                <option value="ml">Malayalam</option>
+              </select>
+              <label className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={voice}
+                  onChange={(e) => setVoice(e.target.checked)}
+                  className="h-4 w-4 accent-[#211B5F]"
+                />
+                Voice
+              </label>
+              {audio ? <audio controls src={audio} className="h-9" /> : null}
             </div>
 
             {error ? <p className="mt-3 text-sm font-medium text-rose-700">{error}</p> : null}

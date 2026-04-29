@@ -13,6 +13,8 @@ class ChatMessage(BaseModel):
 class ChatRequest(BaseModel):
     question: str = Field(..., min_length=1)
     history: list[ChatMessage] = Field(default_factory=list)
+    lang: str = "en"
+    voice: bool = False
 
 
 class ChatResponse(BaseModel):

@@ -5,6 +5,7 @@ import type {
   CompareResponse,
   GuideResponse,
   HealthResponse,
+  LanguageCode,
   MisinformationResponse,
   ReadinessResponse,
   SimulateResponse,
@@ -83,6 +84,12 @@ export function getApiBaseUrl(): string {
   return API_BASE_URL;
 }
 
+export function toApiAssetUrl(path?: string | null): string {
+  if (!path) return '';
+  if (/^https?:\/\//i.test(path)) return path;
+  return `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+}
+
 export async function health(): Promise<HealthResponse> {
   return requestJson<HealthResponse>('/health', { method: 'GET' });
 }
@@ -91,31 +98,51 @@ export async function sources(): Promise<SourcesResponse> {
   return requestJson<SourcesResponse>('/sources', { method: 'GET' });
 }
 
-export async function chat(question: string, history: ChatMessage[]): Promise<ChatResponse> {
+export async function chat(
+  question: string,
+  history: ChatMessage[],
+  lang: LanguageCode = 'en',
+  voice = false
+): Promise<ChatResponse> {
   return requestJson<ChatResponse>('/chat', {
     method: 'POST',
-    body: JSON.stringify({ question, history }),
+    body: JSON.stringify({ question, history, lang, voice }),
   });
 }
 
-export async function generateGuide(topic: string, audience?: string): Promise<GuideResponse> {
+export async function generateGuide(
+  topic: string,
+  audience?: string,
+  lang: LanguageCode = 'en',
+  voice = false
+): Promise<GuideResponse> {
   return requestJson<GuideResponse>('/generate-guide', {
     method: 'POST',
-    body: JSON.stringify({ topic, audience: audience || null }),
+    body: JSON.stringify({ topic, audience: audience || null, lang, voice }),
   });
 }
 
-export async function compare(left: string, right: string, context?: string): Promise<CompareResponse> {
+export async function compare(
+  left: string,
+  right: string,
+  context?: string,
+  lang: LanguageCode = 'en',
+  voice = false
+): Promise<CompareResponse> {
   return requestJson<CompareResponse>('/compare', {
     method: 'POST',
-    body: JSON.stringify({ left, right, context: context || null }),
+    body: JSON.stringify({ left, right, context: context || null, lang, voice }),
   });
 }
 
-export async function misinformationCheck(claim: string): Promise<MisinformationResponse> {
+export async function misinformationCheck(
+  claim: string,
+  lang: LanguageCode = 'en',
+  voice = false
+): Promise<MisinformationResponse> {
   return requestJson<MisinformationResponse>('/misinformation-check', {
     method: 'POST',
-    body: JSON.stringify({ claim }),
+    body: JSON.stringify({ claim, lang, voice }),
   });
 }
 
@@ -126,6 +153,8 @@ export async function readinessScore(payload: {
   simulation_done: boolean;
   polling_location_verified: boolean;
   understand_rights: boolean;
+  lang?: LanguageCode;
+  voice?: boolean;
 }): Promise<ReadinessResponse> {
   return requestJson<ReadinessResponse>('/readiness-score', {
     method: 'POST',

@@ -15,10 +15,6 @@ class LLMOrchestrator:
         if result and result.text.strip():
             return result.text.strip(), result.provider
 
-        result = await self.gemini.generate(system, prompt)
-        if result and result.text.strip():
-            return result.text.strip(), result.provider
-
         result = await self.groq.generate(system, prompt)
         if result and result.text.strip():
             return result.text.strip(), result.provider

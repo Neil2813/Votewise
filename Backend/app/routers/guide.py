@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
-from app.schemas.guide import GuideRequest, GuideResponse
+from app.schemas.guide import GuideRequest
+from app.schemas.common import ResponseData, StandardResponse
 from app.core.policy import detect_non_india_request, safe_block_message
 from app.services.retrieval import kb
-from app.services.llm.orchestrator import llm_orchestrator
 from app.services.local_response import build_rule_answer
+from app.services.response_engine import process_response
 
 router = APIRouter(tags=["guide"])
 
@@ -17,8 +18,8 @@ Never invent law or procedure not supported by the stored sources.
 """
 
 
-@router.post("/generate-guide", response_model=GuideResponse)
-async def generate_guide(payload: GuideRequest) -> GuideResponse:
+@router.post("/generate-guide", response_model=StandardResponse)
+async def generate_guide(payload: GuideRequest) -> StandardResponse:
     topic = payload.topic.strip()
     if detect_non_india_request(topic):
         raise HTTPException(status_code=400, detail=safe_block_message())
@@ -40,23 +41,30 @@ Retrieved knowledge:
 {context}
 """
 
-    answer, provider = await llm_orchestrator.generate(SYSTEM_PROMPT, prompt)
-    if provider == "local-failure":
-        answer = (
-            "Eligibility\n"
-            "- Use verified India-only rules.\n\n"
-            "Registration\n"
-            "- Refer to the voter registration file when available.\n\n"
-            "Nomination\n"
-            "- Use the election rules file for nomination and oath requirements.\n\n"
-            "Poll-day process\n"
-            "- Follow poll-day rules from the election rules file.\n\n"
-            "Do's and don'ts\n"
-            "- Do stay neutral, follow official instructions, and avoid prohibited conduct."
-        )
-        provider = "local-template"
-
+    fallback = (
+        "Eligibility\n"
+        "- Use verified India-only rules.\n\n"
+        "Registration\n"
+        "- Refer to the voter registration file when available.\n\n"
+        "Nomination\n"
+        "- Use the election rules file for nomination and oath requirements.\n\n"
+        "Poll-day process\n"
+        "- Follow poll-day rules from the election rules file.\n\n"
+        "Do's and don'ts\n"
+        "- Do stay neutral, follow official instructions, and avoid prohibited conduct."
+    )
     if not hits:
-        answer = build_rule_answer(topic, hits)
+        fallback = build_rule_answer(topic, hits)
 
-    return GuideResponse(guide=answer, mode=provider, sources=hits[:5])
+    result = await process_response(
+        user_query=topic,
+        rag_context=context,
+        lang=payload.lang,
+        use_voice=payload.voice,
+        system=SYSTEM_PROMPT,
+        prompt=prompt,
+        fallback_text=fallback,
+        format_instruction="Keep this as a practical step-by-step guide.",
+    )
+
+    return StandardResponse(data=ResponseData(**result))

@@ -10,6 +10,8 @@ class ReadinessRequest(BaseModel):
     simulation_done: bool = False
     polling_location_verified: bool = False
     understand_rights: bool = False
+    lang: str = "en"
+    voice: bool = False
 
 
 class ReadinessResponse(BaseModel):
