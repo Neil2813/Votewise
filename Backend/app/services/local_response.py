@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from app.schemas.common import SourceHit
+from app.services.response_engine import clean_source_text
 
 
 def summarize_hits(question: str, hits: list[SourceHit], max_items: int = 3) -> str:
@@ -13,7 +14,7 @@ def summarize_hits(question: str, hits: list[SourceHit], max_items: int = 3) -> 
     lines = []
     for hit in hits[:max_items]:
         title = f"{hit.section.title()}" if hit.section else hit.source
-        snippet = hit.text.replace("\n", " ").strip()
+        snippet = clean_source_text(hit.text)
         if len(snippet) > 260:
             snippet = snippet[:260].rstrip() + "..."
         lines.append(f"- {title}: {snippet}")
@@ -28,9 +29,9 @@ def build_rule_answer(question: str, hits: list[SourceHit]) -> str:
         )
     summary = summarize_hits(question, hits)
     return (
-        "Verified source-based summary:\n"
+        "Here is a simple answer:\n"
         f"{summary}\n\n"
-        "If the stored text is partial, the answer should be treated as a summary, not a legal opinion."
+        "This is a simple educational summary, not legal advice."
     )
 
 
@@ -39,5 +40,6 @@ def build_table_summary(left: str, right: str, hits: list[SourceHit]) -> str:
         return "No verified comparison data was found in the available India-only files."
     rows = []
     for hit in hits[:4]:
-        rows.append(f"{hit.section.title() if hit.section else hit.source}: {hit.text[:220].replace(chr(10), ' ')}")
-    return "Comparison basis:\n" + "\n".join(f"- {row}" for row in rows)
+        text = clean_source_text(hit.text)
+        rows.append(f"{hit.section.title() if hit.section else 'Reference'}: {text[:220]}")
+    return "Simple comparison:\n" + "\n".join(f"- {row}" for row in rows)

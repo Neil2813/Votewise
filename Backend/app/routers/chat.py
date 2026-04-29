@@ -6,7 +6,7 @@ from app.schemas.common import ResponseData, StandardResponse
 from app.core.policy import detect_non_india_request, is_blocked_politically, safe_block_message
 from app.services.retrieval import kb
 from app.services.local_response import build_rule_answer
-from app.services.response_engine import process_response
+from app.services.response_engine import clean_source_text, process_response
 
 router = APIRouter(tags=["chat"])
 
@@ -31,7 +31,7 @@ async def chat(payload: ChatRequest) -> StandardResponse:
     hits = kb.retrieve(q)
     if hits:
         context = "\n\n".join(
-            f"[{h.source} | {h.section} | {h.kind} | score={h.score}]\n{h.text}"
+            f"[{h.section or h.kind or 'reference'}]\n{clean_source_text(h.text)}"
             for h in hits
         )
     else:

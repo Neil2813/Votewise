@@ -6,7 +6,7 @@ from app.schemas.common import ResponseData, StandardResponse
 from app.core.policy import detect_non_india_request, safe_block_message
 from app.services.retrieval import kb
 from app.services.rules import local_myth_response
-from app.services.response_engine import process_response
+from app.services.response_engine import clean_source_text, process_response
 
 router = APIRouter(tags=["misinformation"])
 
@@ -30,7 +30,7 @@ async def misinformation_check(payload: MisinformationRequest) -> StandardRespon
 {claim}
 
 Stored references:
-{chr(10).join(f'- {h.section} | {h.kind} | {h.text}' for h in hits)}
+{chr(10).join(f'- {h.section or h.kind or "reference"}: {clean_source_text(h.text)}' for h in hits)}
 
 Return JSON-like text with:
 Verdict: True / False / Unverified
@@ -43,12 +43,12 @@ Matched rule: ...
         f"Verdict: {verdict}\n\n"
         "Explanation: This claim was checked against the stored misinformation file. "
         "The claim is not fully verified by the current India-only knowledge base.\n\n"
-        f"Matched rule: {matched.text if matched else matched_rule or 'No matching stored rule found.'}"
+        f"Matched rule: {clean_source_text(matched.text) if matched else clean_source_text(matched_rule or '') or 'No matching stored rule found.'}"
     )
 
     result = await process_response(
         user_query=claim,
-        rag_context="\n".join(h.text for h in hits),
+        rag_context="\n".join(clean_source_text(h.text) for h in hits),
         lang=payload.lang,
         use_voice=payload.voice,
         system=SYSTEM_PROMPT,

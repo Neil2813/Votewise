@@ -64,6 +64,9 @@ def translate_text(text: str, target_lang: str) -> str:
 
 
 def text_to_speech(text: str, lang: str = "en") -> str | None:
+    if _normalize_lang(lang) != "en":
+        return None
+
     try:
         import pyttsx3
 
@@ -111,7 +114,9 @@ Retrieved knowledge:
     if provider == "local-failure" or not response.strip():
         response = fallback_text or "I could not generate a complete answer from the available India-only knowledge."
 
+    response = clean_user_text(response)
     formatted = await format_with_llm(response, instruction=format_instruction)
+    formatted = clean_user_text(formatted)
     translated = translate_text(formatted, lang)
 
     audio_file = None
@@ -127,3 +132,52 @@ Retrieved knowledge:
 def _normalize_lang(lang: str | None) -> str:
     normalized = (lang or "en").strip().lower()
     return normalized if normalized in SUPPORTED_LANGUAGES else "en"
+
+
+def clean_source_text(text: str) -> str:
+    clean_lines: list[str] = []
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        lower = line.lower()
+        if not line:
+            continue
+        if lower.startswith("source: placeholder"):
+            continue
+        if lower.startswith("source:"):
+            continue
+        if lower.startswith("title:"):
+            line = line.split(":", 1)[1].strip()
+        source_index = line.lower().find(" source:")
+        if source_index != -1:
+            line = line[:source_index].strip()
+        clean_lines.append(line)
+    return " ".join(clean_lines).strip()
+
+
+def clean_user_text(text: str) -> str:
+    text = text.replace("Verified source-based summary:", "Here is a simple answer:")
+    text = text.replace(
+        "If the stored text is partial, the answer should be treated as a summary, not a legal opinion.",
+        "This is a simple educational summary, not legal advice.",
+    )
+
+    lines: list[str] = []
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        lower = line.lower()
+        if not line:
+            lines.append("")
+            continue
+        if "source: placeholder" in lower:
+            source_index = lower.find("source: placeholder")
+            line = line[:source_index].strip()
+            if not line:
+                continue
+        line = line.replace("TITLE:", "").replace("SOURCE:", "")
+        if "Placeholder for the verified India-only" in line:
+            line = line.split("Placeholder for the verified India-only", 1)[0].strip()
+            if not line:
+                continue
+        lines.append(line)
+
+    return "\n".join(lines).strip()
