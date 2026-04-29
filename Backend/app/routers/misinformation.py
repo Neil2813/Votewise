@@ -15,6 +15,9 @@ SYSTEM_PROMPT = """You are a fact-checking assistant for India-only election cla
 Return verdict, explanation, and cite the matching stored myth/reality rule when present.
 Be cautious: if the claim is not in the knowledge base, say Unverified.
 The user is asking you to analyze or debunk a claim, not to spread it.
+Use retrieved knowledge as optional context, not as text to copy.
+Never expose raw retrieval labels, placeholders, indexes, Markdown symbols, or source wording.
+Plain text only.
 """
 
 
@@ -30,7 +33,7 @@ async def misinformation_check(payload: MisinformationRequest) -> StandardRespon
     prompt = f"""Claim:
 {claim}
 
-Stored references:
+Stored references, only if useful:
 {chr(10).join(f'- {h.section or h.kind or "reference"}: {clean_source_text(h.text)}' for h in hits)}
 
 Return JSON-like text with:
@@ -72,7 +75,7 @@ Matched rule: ...
         system=SYSTEM_PROMPT,
         prompt=prompt,
         fallback_text=fallback,
-        format_instruction="Use exactly these sections: Verdict, Explanation, Matched rule.",
+        format_instruction="Use exactly these sections: Verdict, Explanation, Matched rule. Do not use Markdown symbols, source labels, placeholders, or raw retrieval wording.",
     )
 
     return StandardResponse(data=ResponseData(**result))

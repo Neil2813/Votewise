@@ -13,8 +13,10 @@ router = APIRouter(tags=["guide"])
 
 SYSTEM_PROMPT = """You generate concise India-only election process guides.
 You must be neutral, factual, and educational.
-Use retrieved knowledge first.
-Never invent law or procedure not supported by the stored sources.
+Use retrieved knowledge as optional context, not as text to copy.
+If retrieved knowledge is weak, incomplete, or placeholder-like, still give a useful general India election guide.
+Never expose raw retrieval labels, placeholders, indexes, Markdown symbols, or source wording.
+Plain text only.
 """
 
 
@@ -39,8 +41,11 @@ Must include:
 - poll-day process
 - do's and don'ts
 
-Retrieved knowledge:
+Retrieved knowledge, only if useful:
 {context}
+
+Write this like a helpful guide, not a retrieval summary.
+Do not copy placeholder text.
 """
 
     fallback = build_guide_answer(topic, hits)
@@ -53,7 +58,7 @@ Retrieved knowledge:
         system=SYSTEM_PROMPT,
         prompt=prompt,
         fallback_text=fallback,
-        format_instruction="Keep this as a practical step-by-step guide.",
+        format_instruction="Keep this as a practical step-by-step guide. Do not use Markdown symbols, source labels, placeholders, or raw retrieval wording.",
     )
 
     return StandardResponse(data=ResponseData(**result))

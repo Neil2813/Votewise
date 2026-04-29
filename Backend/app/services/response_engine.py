@@ -19,6 +19,7 @@ Instructions:
 Format:
 - Short paragraphs
 - Bullet points if needed
+- Plain text only; do not use Markdown headings, bold markers, tables, or citation markers
 """
 
 SUPPORTED_LANGUAGES = {"en", "hi", "ta", "te", "kn", "ml"}
@@ -39,6 +40,7 @@ Rules:
 - India-specific context only
 - No technical jargon
 - Do not include citations, indexes, contentReference markers, source placeholders, or raw database labels
+- Plain text only. Do not use Markdown syntax such as **bold**, # headings, tables, or citation markers
 {f"- {instruction}" if instruction else ""}
 
 TEXT:
@@ -190,6 +192,11 @@ def clean_user_text(text: str) -> str:
 def _strip_artifacts(text: str) -> str:
     text = re.sub(r":contentReference\[[^\]]+\]\{[^}]+\}", "", text)
     text = re.sub(r"\[oaicite:[^\]]+\]\{[^}]+\}", "", text)
+    text = re.sub(r"^\s{0,3}#{1,6}\s*", "", text, flags=re.MULTILINE)
+    text = re.sub(r"\*\*(.*?)\*\*", r"\1", text)
+    text = re.sub(r"__(.*?)__", r"\1", text)
+    text = re.sub(r"^\s*[-*]\s+", "- ", text, flags=re.MULTILINE)
+    text = re.sub(r"`([^`]*)`", r"\1", text)
     text = re.sub(r"\s+---+\s*", "\n", text)
     text = re.sub(r"[ \t]{2,}", " ", text)
     text = re.sub(r"\n{3,}", "\n\n", text)

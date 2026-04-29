@@ -25,6 +25,9 @@ async def readiness_score(payload: ReadinessRequest) -> StandardResponse:
     prompt = f"""Convert this local readiness result into a simple voter-facing explanation.
 
 {raw_result}
+
+Use plain text only.
+Do not use Markdown symbols.
 """
 
     result = await process_response(

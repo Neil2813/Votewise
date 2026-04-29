@@ -13,7 +13,10 @@ router = APIRouter(tags=["compare"])
 
 SYSTEM_PROMPT = """You produce neutral India-only comparisons of election rules or roles.
 Never recommend a candidate or party.
-Use only the supplied context.
+Use retrieved knowledge as optional context, not as text to copy.
+If retrieved knowledge is weak, incomplete, or placeholder-like, still explain using general India election knowledge.
+Never expose raw retrieval labels, placeholders, indexes, Markdown symbols, or source wording.
+Plain text only.
 """
 
 
@@ -33,10 +36,11 @@ Left: {payload.left}
 Right: {payload.right}
 Context: {payload.context or 'none'}
 
-Retrieved knowledge:
+Retrieved knowledge, only if useful:
 {context}
 
-Return concise bullet points and avoid voting recommendations.
+Return a helpful comparison and avoid voting recommendations.
+Do not simply summarize retrieval.
 """
 
     result = await process_response(
@@ -47,7 +51,7 @@ Return concise bullet points and avoid voting recommendations.
         system=SYSTEM_PROMPT,
         prompt=prompt,
         fallback_text=build_table_summary(payload.left, payload.right, hits),
-        format_instruction="Use a table-like comparison with clear labels for both sides.",
+        format_instruction="Use a clear comparison with labels for both sides. Do not use Markdown tables, source labels, placeholders, or raw retrieval wording.",
     )
 
     return StandardResponse(data=ResponseData(**result))
