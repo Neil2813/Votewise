@@ -5,151 +5,134 @@ import {
   BadgeAlert,
   Gauge,
   MonitorPlay,
-  SearchCheck,
-  CircleGauge,
   Landmark,
 } from 'lucide-react';
-import type { HealthResponse } from '../lib/types';
-import { StatusPill } from '../components/StatusPill';
 
-const cards = [
-  {
-    key: 'chat',
-    title: 'Chat Coach',
-    desc: 'Ask election-related questions and get clear, neutral answers.',
-    icon: MessageSquareText,
-  },
-  {
-    key: 'guide',
-    title: 'Guide Generator',
-    desc: 'Create a simple, audience-friendly election process summary.',
-    icon: FileText,
-  },
-  {
-    key: 'compare',
-    title: 'Neutral Compare',
-    desc: 'Compare roles, rules, and processes without bias.',
-    icon: Landmark,
-  },
-  {
-    key: 'misinformation',
-    title: 'Fact Check',
-    desc: 'Check claims, myths, and rumors against trusted references.',
-    icon: BadgeAlert,
-  },
-  {
-    key: 'readiness',
-    title: 'Readiness Score',
-    desc: 'Review your voting preparedness with a quick local check.',
-    icon: Gauge,
-  },
-  {
-    key: 'simulate',
-    title: 'Simulator',
-    desc: 'Walk through the flow in a guided practice view.',
-    icon: MonitorPlay,
-  },
-] as const;
-
-export function HomePage({
-  onNavigate,
-  health,
-  sourcesCount,
-}: {
-  onNavigate: (page: any) => void;
-  health: HealthResponse | null;
-  sourcesCount: number;
-}) {
+export function HomePage({ onNavigate }: { onNavigate: (page: any) => void }) {
   return (
-    <div className="space-y-6">
-      <section className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#211B5F]/5 px-3 py-1 text-xs font-semibold text-[#211B5F]">
-            <SearchCheck className="h-4 w-4" />
-            Clean, focused experience
-          </div>
+    <div className="min-h-screen bg-[#f8fafc] px-6 py-10">
+      
+      {/* HERO SECTION */}
+      <section className="mx-auto max-w-5xl text-center">
+        
+        <p className="mb-3 text-sm font-semibold text-[#211B5F]">
+          VOTEWISE AI
+        </p>
 
-          <h1 className="max-w-3xl text-4xl font-black tracking-tight text-slate-950 md:text-5xl">
-            A simple election learning space with a calm, modern layout.
-          </h1>
+        <h1 className="text-4xl font-black text-slate-900 md:text-5xl leading-tight">
+          Understand elections.
+          <br />
+          Vote with clarity.
+        </h1>
 
-          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 md:text-lg">
-            This screen is designed to guide users through the main features with clarity,
-            strong hierarchy, and a polished visual flow.
-          </p>
+        <p className="mt-4 text-base text-slate-600 max-w-2xl mx-auto">
+          A clean, focused space to explore election concepts, verify claims,
+          and prepare yourself with confidence.
+        </p>
 
-          <div className="mt-6 flex flex-wrap gap-3">
-            <button
-              onClick={() => onNavigate('chat')}
-              className="inline-flex items-center gap-2 rounded-full bg-[#211B5F] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-95"
-            >
-              Open Chat Coach <ArrowRight className="h-4 w-4" />
-            </button>
+        {/* PRIMARY ACTIONS */}
+        <div className="mt-8 flex justify-center gap-4 flex-wrap">
+          <button
+            onClick={() => onNavigate('chat')}
+            className="rounded-full bg-[#211B5F] px-6 py-3 text-white font-semibold flex items-center gap-2 hover:opacity-95"
+          >
+            Start Chat <ArrowRight className="h-4 w-4" />
+          </button>
 
-            <button
-              onClick={() => onNavigate('guide')}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              Generate Guide
-            </button>
-          </div>
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            <StatusPill
-              label={health?.country_scope ?? 'India-only experience'}
-              tone="info"
-            />
-            <StatusPill label="Source-backed content" tone="good" />
-            <StatusPill label="Fast navigation" tone="neutral" />
-          </div>
-        </div>
-
-        <div className="rounded-[2rem] border border-slate-200 bg-[#0f172a] p-8 text-white shadow-sm">
-          <div className="flex items-center gap-3">
-            <CircleGauge className="h-6 w-6 text-sky-300" />
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">
-              Overview
-            </p>
-          </div>
-
-          <div className="mt-6 space-y-4">
-            <div>
-              <p className="text-sm text-slate-300">Experience</p>
-              <p className="text-2xl font-bold">Focused and clean</p>
-            </div>
-
-            <div>
-              <p className="text-sm text-slate-300">Style</p>
-              <p className="text-lg font-semibold">Modern card-based layout</p>
-            </div>
-
-            <div>
-              <p className="text-sm text-slate-300">Access</p>
-              <p className="text-lg font-semibold">Simple feature entry points</p>
-            </div>
-          </div>
+          <button
+            onClick={() => onNavigate('guide')}
+            className="rounded-full border border-slate-300 px-6 py-3 font-semibold text-slate-700 hover:bg-white"
+          >
+            Generate Guide
+          </button>
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {cards.map(({ key, title, desc, icon: Icon }) => (
-          <button
-            key={key}
-            onClick={() => onNavigate(key as any)}
-            className="group rounded-[2rem] border border-slate-200 bg-white p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-          >
-            <div className="flex items-center justify-between">
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100">
-                <Icon className="h-6 w-6 text-[#211B5F]" />
-              </span>
-              <ArrowRight className="h-5 w-5 text-slate-400 transition group-hover:translate-x-0.5" />
-            </div>
+      {/* SIMPLE FEATURE LIST (NOT CARDS GRID CHAOS) */}
+      <section className="mx-auto mt-14 max-w-4xl">
+        
+        <h2 className="text-sm font-semibold text-slate-500 mb-6">
+          EXPLORE FEATURES
+        </h2>
 
-            <h2 className="mt-4 text-xl font-bold text-slate-950">{title}</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{desc}</p>
-          </button>
-        ))}
+        <div className="divide-y rounded-xl border bg-white">
+          
+          {/* ITEM */}
+          <FeatureRow
+            icon={<MessageSquareText />}
+            title="Chat Coach"
+            desc="Ask questions and get clear explanations."
+            onClick={() => onNavigate('chat')}
+          />
+
+          <FeatureRow
+            icon={<FileText />}
+            title="Guide Generator"
+            desc="Create simplified election guides."
+            onClick={() => onNavigate('guide')}
+          />
+
+          <FeatureRow
+            icon={<Landmark />}
+            title="Neutral Compare"
+            desc="Understand differences without bias."
+            onClick={() => onNavigate('compare')}
+          />
+
+          <FeatureRow
+            icon={<BadgeAlert />}
+            title="Fact Check"
+            desc="Verify claims and misinformation."
+            onClick={() => onNavigate('misinformation')}
+          />
+
+          <FeatureRow
+            icon={<Gauge />}
+            title="Readiness"
+            desc="Check your voting preparedness."
+            onClick={() => onNavigate('readiness')}
+          />
+
+          <FeatureRow
+            icon={<MonitorPlay />}
+            title="Simulator"
+            desc="Practice the voting flow step by step."
+            onClick={() => onNavigate('simulate')}
+          />
+        </div>
       </section>
     </div>
+  );
+}
+
+/* CLEAN ROW COMPONENT INSTEAD OF HEAVY CARDS */
+function FeatureRow({
+  icon,
+  title,
+  desc,
+  onClick,
+}: {
+  icon: any;
+  title: string;
+  desc: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition"
+    >
+      <div className="flex items-center gap-4 text-left">
+        <div className="p-2 rounded-lg bg-slate-100 text-[#211B5F]">
+          {icon}
+        </div>
+        <div>
+          <p className="font-semibold text-slate-900">{title}</p>
+          <p className="text-sm text-slate-500">{desc}</p>
+        </div>
+      </div>
+
+      <ArrowRight className="h-4 w-4 text-slate-400" />
+    </button>
   );
 }
