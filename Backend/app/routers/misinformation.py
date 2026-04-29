@@ -41,12 +41,14 @@ Matched rule: ...
 
     verdict, matched_rule = local_myth_response(claim)
     matched_text = clean_source_text(matched.text) if matched else clean_source_text(matched_rule or "")
+    reality_text = next((clean_source_text(h.text) for h in hits if h.kind == "reality" and clean_source_text(h.text)), "")
     if verdict == "False":
         fallback = (
             "Verdict: False\n\n"
             "Explanation: This claim is treated as false by the available India-only misinformation material. "
-            "Do not rely on it or forward it as election guidance.\n\n"
-            f"Matched rule: {matched_text or 'No matching stored rule found.'}"
+            + (f"{reality_text} " if reality_text else "")
+            + "Do not rely on it or forward it as election guidance.\n\n"
+            f"Matched rule: Myth checked - {matched_text or 'No matching stored myth found.'}"
         )
     elif verdict == "True":
         fallback = (

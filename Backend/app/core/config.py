@@ -3,7 +3,15 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List
+
+try:
+    from dotenv import load_dotenv
+except ImportError:  # pragma: no cover
+    load_dotenv = None
+
+
+if load_dotenv:
+    load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
 
 def _parse_csv(value: str | None, default: list[str]) -> list[str]:
