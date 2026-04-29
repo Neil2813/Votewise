@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Layout } from './components/Layout';
 import { health, sources } from './lib/api';
 import type { HealthResponse, PageKey } from './lib/types';
-import HomePage from './pages/HomePage';
+import { HomePage } from './pages/HomePage';
 import { ChatPage } from './pages/ChatPage';
 import { GuidePage } from './pages/GuidePage';
 import { ComparePage } from './pages/ComparePage';
